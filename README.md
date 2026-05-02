@@ -140,7 +140,7 @@ psql -U postgres -d pgbench -f adding_14_indexes.sql
 # Clean the bgwriter metrics
 psql -U postgres -d pgbench -c "SELECT pg_stat_reset_shared('bgwriter')"
 # Clean database metrics
-psql -U postgres -d pgbench -c "SELECT pg_stat_reset()" -d pgbench
+psql -U postgres -d pgbench -c "SELECT pg_stat_reset()"
 # Remove any cache at OS and DB level (as OS superuser / root)
 systemctl stop postgresql-17
 echo 3 > /proc/sys/vm/drop_caches
