@@ -92,13 +92,13 @@ psql -U postgres -c "CREATE DATABASE pgbench"
 ### 3. Build your database schema
 Build the database schema by using the [pgbench_custom_schema.sql](pgbench_custom_schema.sql) file.
 ```bash
-psql -d pgbench -f pgbench_custom_schema.sql
+psql -U postgres -d pgbench -f pgbench_custom_schema.sql
 ```
 
 ### 4. Populate your database schema
 Populate your database schema by using the [pgbench_schema_initial_data_load.sql](pgbench_schema_initial_data_load.sql) file.
 ```bash
-psql -d pgbench -f pgbench_schema_initial_data_load.sql
+psql -U postgres -d pgbench -f pgbench_schema_initial_data_load.sql
 ```
 #### Considerations
 Once the data schema has been loaded with the dataset, you may consider running a `pg_dump` to produce an exact copy of the data.
