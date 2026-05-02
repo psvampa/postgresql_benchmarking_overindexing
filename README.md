@@ -131,9 +131,11 @@ The recommended steps to refresh the environment and run new tests are as follow
 # Recreate your database from previous dump
 pg_restore -U postgres -d postgres -j 4 --clean --if-exists dump_pgbench_metadata.dump
 # Use the adding_#_indexes.sql scripts to add additional indexes to the schema
-psql -f create_14_indexes.sql pgbench
+psql -U postgres -d pgbench -f adding_14_indexes.sql
 # Clean the bgwriter metrics
-psql -c "SELECT pg_stat_reset_shared('bgwriter')"
+psql -U postgres -d pgbench -c "SELECT pg_stat_reset_shared('bgwriter')"
+# Clean database metrics
+psql -U postgres -d pgbench -c "SELECT pg_stat_reset()" -d pgbench
 # Remove any cache at OS and DB level (as OS superuser / root)
 systemctl stop postgresql-17
 echo 3 > /proc/sys/vm/drop_caches

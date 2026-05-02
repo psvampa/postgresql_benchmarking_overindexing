@@ -10,9 +10,15 @@ WITH new_products AS (
   FROM generate_series(1, 10)
   RETURNING id
 ),
--- 2. Select 10 random warehouses
+-- 2. Pick 10 random warehouse ids without scanning the warehouses table.
+-- The warehouses load file produces contiguous ids in the range [1, 2500];
+-- adjust the upper bound here if that volume changes. Occasional duplicates
+-- among the 10 draws are harmless: they cause the cross join below to emit
+-- duplicate (product_id, warehouse_id) pairs that are absorbed by the
+-- ON CONFLICT DO NOTHING clause on the stock UNIQUE constraint.
 random_warehouses AS (
-  SELECT id FROM warehouses ORDER BY random() LIMIT 10
+  SELECT (floor(random() * 2500)::int + 1) AS id
+  FROM generate_series(1, 10)
 ),
 -- 3. Cross join new products and 10 warehouses to create stock entries
 stock_data AS (
@@ -52,12 +58,14 @@ FROM stock_data
 ON CONFLICT (product_id, warehouse_id) DO NOTHING;
 
 
--- 5. Insert 5 inbound stock movements and update stock accordingly
--- Choose 5 pseudo-random stock entries using TABLESAMPLE (fast, but approximate)
+-- 5. Insert up to 10 inbound stock movements and update the corresponding stock rows.
+-- TABLESAMPLE SYSTEM picks random pages from stock and we cap the result at 10 rows;
+-- the sample percentage may need to be revisited if the stock volume changes
+-- significantly (it currently targets ~50 million rows).
 WITH selected_stock AS (
   SELECT product_id, warehouse_id
   FROM stock
-  TABLESAMPLE SYSTEM (0.05) -- Adjust % based on table size
+  TABLESAMPLE SYSTEM (0.05)
   LIMIT 10
 ),
 movements AS (
