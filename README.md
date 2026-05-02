@@ -84,13 +84,18 @@ $
 Install the PostgreSQL version of your choice. You can follow the installation procedure detailed on https://www.postgresql.org/download/.
 My benchmark was performed using PostgreSQL version 17. Given the available hardware resources and the benchmark's needs, PostgreSQL was configured according to the settings included in the [postgresql.auto.conf](postgresql.auto.conf) file.
 
-### 2. Build your database schema
+### 2. Create a pgbench database
+```bash
+psql -U postgres -c "CREATE DATABASE pgbench"
+```
+
+### 3. Build your database schema
 Build the database schema by using the [pgbench_custom_schema.sql](pgbench_custom_schema.sql) file.
 ```bash
 psql -d pgbench -f pgbench_custom_schema.sql
 ```
 
-### 3. Populate your database schema
+### 4. Populate your database schema
 Populate your database schema by using the [pgbench_schema_initial_data_load.sql](pgbench_schema_initial_data_load.sql) file.
 ```bash
 psql -d pgbench -f pgbench_schema_initial_data_load.sql
@@ -102,7 +107,7 @@ This dump can be used to quickly and reliably recreate the database between test
 pg_dump -U postgres -d pgbench -F c --clean -C -f dump_pgbench_metadata.dump
 ```
 
-### 4. Performing pgbench
+### 5. Performing pgbench
 You can now run `pgbench` using the custom script [pgbench_tpc-b_custom_load.sql](pgbench_tpc-b_custom_load.sql).
 You may adjust the execution conditions and concurrency levels according to your needs by modifying the `pgbench` parameters.
 For more information, refer to the official `pgbench` documentation: https://www.postgresql.org/docs/17/pgbench.html
@@ -122,7 +127,7 @@ SELECT xact_commit,
 FROM   pg_stat_database
 WHERE  datname = 'pgbench'; 
 ```
-### 5. Adding indexes for comparison
+### 6. Adding indexes for comparison
 Once the initial test round has been completed, you may be interested in running additional test rounds with more indexes.
 This repository includes the scripts [adding_7_indexes.sql](adding_7_indexes.sql), [adding_14_indexes.sql](adding_14_indexes.sql), [adding_21_indexes.sql](adding_21_indexes.sql), and [adding_32_indexes.sql](adding_32_indexes.sql).
 These indexes can be added on top of the original schema, which already includes seven initial indexes.
